@@ -57,8 +57,19 @@ const insertMetric = async (siteId, metricValue, metricName, timestamp) => {
 
   const metricKey = keyGenerator.getDayMetricKey(siteId, metricName, timestamp);
   const minuteOfDay = timeUtils.getMinuteOfDay(timestamp);
-
+  /*
+  To solve this challenge, you'll need to add code to the body of the insertMetric function. First you need to add a metric value to the sorted set whose key is stored in the variable metricKey.
+  
+  For the score, use the value stored in minuteOfDay. You should generate the value used for the set element by calling the helper function formatMeasurementMinute. This function is also contained in metric_dao_redis_impl.js.
+  
+  Then, you should ensure that the sorted set held at metricKey is set to expire after metricExpirationSeconds, whose value is defined at the top of the file.
+  */
   // START Challenge #2
+
+  const formattedMeasurement = formatMeasurementMinute(metricValue, minuteOfDay);
+  await client.zaddAsync(metricKey, minuteOfDay, formattedMeasurement);
+  await client.expireAsync(metricKey, metricExpirationSeconds);
+
   // END Challenge #2
 };
 /* eslint-enable */
